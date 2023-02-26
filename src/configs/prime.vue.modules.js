@@ -10,13 +10,14 @@ import ProgressBar from 'primevue/progressbar';
 import Textarea from 'primevue/textarea';
 import Image from 'primevue/image';
 import Card from 'primevue/card';
+import Knob from 'primevue/knob';
 import ('primevue/resources/themes/tailwind-light/theme.css')
 import ('primevue/resources/primevue.min.css')
 import ('primeicons/primeicons.css')
 import ('primeflex/primeflex.css');
 export default {
   modules: [
-      InputText, Button, Fieldset, ProgressBar, Dialog,  Message, Textarea, Image, Card
+      InputText, Button, Fieldset, ProgressBar, Dialog,  Message, Textarea, Image, Card, Knob
   ],
   directives: [
         {name: "tooltip", subject: Tooltip}
