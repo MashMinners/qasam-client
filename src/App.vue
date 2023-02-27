@@ -43,7 +43,16 @@
               </div>
             </Transition>
             <div class="centered" v-if="step.number === 3">
-                <prime-textarea v-model="dto.ratingRecordComment" :autoResize="true" rows="5" cols="30"/>
+                <prime-textarea
+                    :autoResize="true"
+                    rows="5"
+                    cols="30"
+                    :value="dto.ratingRecordComment"
+                    class="input"
+                    @input="onInputChange"
+                    placeholder="Оставьте комментарий"
+                />
+                <simple-keyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="dto.ratingRecordComment" style="width: 800px;"/>
                 <prime-button label="Закончить" class="p-button-lg" @click="sendVote"/>
               </div>
             <div class="centered" v-if="step.number === 4">
@@ -66,6 +75,7 @@
 </template>
 <script>
 import axios from "axios";
+import SimpleKeyboard from "@/components/SimpleKeyboard.vue";
 export default {
   data() {
     return {
@@ -91,12 +101,11 @@ export default {
       finalTimerEnabled: false,
       finalTimerCount: 10,
       votedTimerEnabled: false,
-      votedTimerCount: 10
+      votedTimerCount: 10,
+      delayTimer: null
     }
   },
-  components: {
-
-  },
+  components: {SimpleKeyboard},
   computed:{
 
   },
@@ -115,6 +124,8 @@ export default {
           setTimeout(() => {
             this.finalTimerCount--;
           }, 1000);
+        }else if(value === 0){
+          this.clearModel()
         }
       },
       immediate: true // This ensures the watcher is triggered upon creation
@@ -133,12 +144,25 @@ export default {
           setTimeout(() => {
             this.votedTimerCount--;
           }, 1000);
+        }else if(value === 0){
+          this.clearModel()
         }
       },
       immediate: true // This ensures the watcher is triggered upon creation
     }
   },
   methods: {
+
+    onChange(input) {
+      this.dto.ratingRecordComment = input;
+    },
+    onKeyPress(button) {
+      console.log("button", button);
+    },
+    onInputChange(input) {
+      this.dto.ratingRecordComment = input.target.value;
+    },
+
     playFinalTimer() {
       this.finalTimerEnabled = true;
     },
@@ -160,32 +184,36 @@ export default {
         document.getElementById('autofocus').focus();
       }, 500);
     },
-    async gotoSecond() {
-      const params = {ratingRecordId: this.dto.ratingRecordId}
-      const response = await axios.get('http://192.168.0.10/?XDEBUG_SESSION_START=PHPSTORM', {params});
-      if(response.data.status === 'not voted'){
-        //State Machine
-        this.step.number = 2;
-        this.step.text = 'Второй шаг';
-        this.step.message = 'Выбирите справедливую на ваш взгляд оценку';
-        this.step.value = 40;
-        //Сотрудник
-        this.employee.employeeSurname = response.data.body.employeeSurname
-        this.employee.employeeFirstName = response.data.body.employeeFirstName
-        this.employee.employeeSecondName = response.data.body.employeeSecondName
-        this.employee.employeePosition = response.data.body.employeePosition
-        this.employee.employeePhoto = response.data.body.employeePhoto
+    gotoSecond() {
+      if (this.delayTimer) {
+        clearTimeout(this.delayTimer);
+        this.delayTimer = null;
       }
-      else {
-        this.playVotedTimer();
-        setTimeout(() => {
-          this.clearModel()
-        }, 10000);
-        this.step.number = 5;
-        this.step.text = 'Ошибка';
-        this.step.message = 'Вы уже голосовали за этого врача!';
-        this.step.value = 40;
-      }
+      this.delayTimer = setTimeout(async () => {
+        const params = {ratingRecordId: this.dto.ratingRecordId}
+        const response = await axios.get('http://192.168.0.10/?XDEBUG_SESSION_START=PHPSTORM', {params});
+        if(response.data.status === 'not voted'){
+          //State Machine
+          this.step.number = 2;
+          this.step.text = 'Второй шаг';
+          this.step.message = 'Выбирите справедливую на ваш взгляд оценку';
+          this.step.value = 40;
+          //Сотрудник
+          this.employee.employeeSurname = response.data.body.employeeSurname
+          this.employee.employeeFirstName = response.data.body.employeeFirstName
+          this.employee.employeeSecondName = response.data.body.employeeSecondName
+          this.employee.employeePosition = response.data.body.employeePosition
+          this.employee.employeePhoto = response.data.body.employeePhoto
+        }
+        else {
+          this.playVotedTimer();
+          this.step.number = 5;
+          this.step.text = 'Ошибка';
+          this.step.message = 'Вы уже голосовали за этого врача!';
+          this.step.value = 40;
+        }
+      }, 300);
+
     },
     gotoThird(value) {
       this.step.number = 3;
@@ -203,10 +231,9 @@ export default {
       this.step.text = 'Конец';
       this.step.message = 'Оценка завершена';
       this.step.value = 100;
-      this.playFinalTimer()
-      setTimeout(() => {
-        this.clearModel()
-      }, 10000);
+      this.playFinalTimer();
+      console.log('This INPUT ' + this.input)
+      console.log('This DTO Record Comment ' + this.dto.ratingRecordComment)
     },
     clearModel(){
       this.pauseFinalTimer()
@@ -269,7 +296,7 @@ export default {
   font-style: italic;
 }
 .v-enter-active{
-  transition: opacity 1.5s ease;
+  transition: opacity 1s ease;
 }
 .v-leave-active{
 
