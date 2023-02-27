@@ -76,6 +76,7 @@
 <script>
 import axios from "axios";
 import SimpleKeyboard from "@/components/SimpleKeyboard.vue";
+import connections from "@/configs/connections";
 export default {
   data() {
     return {
@@ -191,7 +192,7 @@ export default {
       }
       this.delayTimer = setTimeout(async () => {
         const params = {ratingRecordId: this.dto.ratingRecordId}
-        const response = await axios.get('http://192.168.0.10/?XDEBUG_SESSION_START=PHPSTORM', {params});
+        const response = await axios.get(connections.api.dev, {params});
         if(response.data.status === 'not voted'){
           //State Machine
           this.step.number = 2;
@@ -223,7 +224,7 @@ export default {
       this.dto.ratingRecordValue = value;
     },
     async sendVote() {
-      const response = await axios.post('http://192.168.0.10/?XDEBUG_SESSION_START=PHPSTORM', {
+      const response = await axios.post(connections.api.dev, {
         ratingRecordId: this.dto.ratingRecordId,
         ratingRecordValue: this.dto.ratingRecordValue,
         ratingRecordComment: this.dto.ratingRecordComment});
