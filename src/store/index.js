@@ -1,17 +1,8 @@
 import { createStore } from 'vuex';
-import axios from "axios";
+import {appModule} from "@/store/appModule";
 
 export default createStore({
-  state: () => ({
-    //Даты и время
-    currentDate: new Date().toISOString().slice(0, 10),
-  }),
-  getters: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
   modules: {
+    app: appModule
   }
 })
