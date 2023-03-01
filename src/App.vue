@@ -77,25 +77,6 @@ import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
 export default {
   data() {
     return {
-      /*step: {
-        number: 0,
-        text: 'Начало',
-        message: 'Начните оценку',
-        value: 0
-      },*/
-      /*dto: {
-        ratingRecordId: '',
-        ratingRecordValue: 0,
-        ratingRecordComment: ''
-      },*/
-      /*employee: {
-        employeeSurname: '',
-        employeeFirstName: '',
-        employeeSecondName: '',
-        employeePosition: '',
-        employeePhoto: ''
-      },*/
-      //Таймеры
       finalTimerEnabled: false,
       finalTimerCount: 10,
       votedTimerEnabled: false,
