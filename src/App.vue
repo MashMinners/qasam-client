@@ -1,69 +1,67 @@
 <template>
   <div id="wrapper">
     <div id="app-header">
-      <prime-message severity="info" :closable="false">{{ step.message }}</prime-message>
+      <prime-message severity="info" :closable="false">{{ stepMessage }}</prime-message>
     </div>
     <div id="app-content">
       <div class="mt-1 mb-3">
-        <prime-progress-bar :value = step.value :show-value="false"></prime-progress-bar>
+        <prime-progress-bar :value = stepCompletion :show-value="false"></prime-progress-bar>
       </div>
       <prime-fieldset>
         <template #legend>
-          {{ step.text }}
+          {{ stepTitle }}
         </template>
         <div class="card">
           <div class="p-fluid grid">
-            <div class="centered" v-if="step.number === 0">
+            <div class="centered" v-if="stepState === 'start'">
               <prime-button label="Начать" class="p-button-lg" @click = gotoFirst />
             </div>
             <!--Поставь v-show если что-->
-            <div class="centered" v-if="step.number === 1">
-                <prime-input-text id="autofocus" v-model="dto.ratingRecordId" @input="gotoSecond" />
+            <div class="centered" v-if="stepState === 'first'">
+                <prime-input-text id="autofocus" :value="dtoRecordId" @input="gotoSecond" />
             </div>
             <Transition>
-              <div class="centered" style="width:50%" v-if="step.number === 2">
+              <div class="centered" style="width:50%" v-if="stepState === 'second'">
                 <div>
-                  <img class="employee-photo centered" :src="require('@/storage/'+ employee.employeePhoto)" width="300">
-                  <!--<img class="employee-photo centered" src="./storage/Chervinsky.png" width="300">-->
-                  <p class="employee-full-name">{{employee.employeeSurname + ' ' + employee.employeeFirstName  + ' ' + employee.employeeSecondName}}</p>
+                  <img class="employee-photo centered" :src="require('@/storage/'+ employeePhoto)" width="300">
+                  <p class="employee-full-name">{{employeeFullname}}</p>
 
-                  <p class="employee-position">{{employee.employeePosition}}</p>
+                  <p class="employee-position">{{employeePosition}}</p>
                 </div>
                 <div class="p-fluid grid">
                   <div class="field col-4">
-                    <prime-button class="p-button-lg p-button-success" label="Отлично"  @click = gotoThird(5) />
+                    <prime-button class="p-button-lg p-button-success" label="Отлично"  @click = "gotoThird('good')" />
                   </div>
                   <div class="field col-4">
-                    <prime-button class="p-button-lg p-button-warning" label="Нормально"  @click = gotoThird(3) />
+                    <prime-button class="p-button-lg p-button-warning" label="Нормально"  @click = "gotoThird('normal')" />
                   </div>
                   <div class="field col-4">
-                    <prime-button class="p-button-lg p-button-danger" label="Плохо"  @click = gotoThird(1) />
+                    <prime-button class="p-button-lg p-button-danger" label="Плохо"  @click = "gotoThird('bad')" />
                   </div>
                 </div>
               </div>
             </Transition>
-            <div class="centered" v-if="step.number === 3">
+            <div class="centered" v-if="stepState === 'third'">
                 <prime-textarea
                     :autoResize="true"
                     rows="5"
                     cols="30"
-                    :value="dto.ratingRecordComment"
+                    :value="dtoRecordComment"
                     class="input"
-                    @input="onInputChange"
                     placeholder="Оставьте комментарий"
                 />
-                <simple-keyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="dto.ratingRecordComment" style="width: 800px;"/>
-                <prime-button label="Закончить" class="p-button-lg" @click="sendVote"/>
+                <simple-keyboard @onChange="keyboardOnChange" :input="dtoRecordComment" style="width: 800px;"/>
+                <prime-button label="Закончить" class="p-button-lg mt-3" @click="finish"/>
               </div>
-            <div class="centered" v-if="step.number === 4">
+            <div class="centered" v-if="stepState === 'finish'">
                 <prime-message severity="info" :closable="false"> Благодарим за вашу оценку!</prime-message>
                 <prime-knob class="centered-text mt-1 mb-1" v-model="finalTimerCount" :max="10"/>
-                <prime-button label="Начать с начала" class="p-button-lg" @click="clearModel"/>
+                <prime-button label="Начать с начала" class="p-button-lg" @click="start"/>
               </div>
-            <div class="centered" v-if="step.number === 5">
+            <div class="centered" v-if="stepState ==='voted'">
               <prime-message severity="error" :closable="false"> Вы уже голосовали за данного врача!</prime-message>
               <prime-knob class="centered-text mt-1 mb-1" valueColor="#EF4444" rangeColor="#ffe7e6" textColor="#EF4444" v-model="votedTimerCount" :max="10"/>
-              <prime-button label="В начало" class="p-button-lg p-button-danger" @click="clearModel"/>
+              <prime-button label="В начало" class="p-button-lg p-button-danger" @click="start"/>
             </div>
           </div>
         </div>
@@ -74,30 +72,29 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 import SimpleKeyboard from "@/components/SimpleKeyboard.vue";
-import connections from "@/configs/connections";
+import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
 export default {
   data() {
     return {
-      step: {
+      /*step: {
         number: 0,
         text: 'Начало',
         message: 'Начните оценку',
         value: 0
-      },
-      dto: {
+      },*/
+      /*dto: {
         ratingRecordId: '',
         ratingRecordValue: 0,
         ratingRecordComment: ''
-      },
-      employee: {
+      },*/
+      /*employee: {
         employeeSurname: '',
         employeeFirstName: '',
         employeeSecondName: '',
         employeePosition: '',
         employeePhoto: ''
-      },
+      },*/
       //Таймеры
       finalTimerEnabled: false,
       finalTimerCount: 10,
@@ -107,8 +104,78 @@ export default {
     }
   },
   components: {SimpleKeyboard},
-  computed:{
-
+  methods: {
+    ...mapMutations({
+      keyboardOnChange: "app/KEYBOARD_ON_CHANGE",
+      firstStep: "app/FIRST_STEP",
+      thirdStep: "app/THIRD_STEP",
+      clearModel: "app/CLEAR_MODEL"
+    }),
+    ...mapActions({
+      secondStep: "app/isVotedAction",
+      sendVote: "app/sendVoteAction"
+    }),
+    gotoFirst() {
+      this.firstStep();
+      setTimeout(() => {
+        document.getElementById('autofocus').focus();
+      }, 500);
+    },
+    gotoSecond(id){
+        if (this.delayTimer) {
+          clearTimeout(this.delayTimer);
+          this.delayTimer = null;
+        }
+        this.delayTimer = setTimeout(()=>{
+          this.secondStep(id.target.value).then(function(response){
+            //Понять как запустит от юда функцию
+          })
+        },500)
+      },
+    gotoThird(grade) {
+      this.thirdStep(grade);
+    },
+    finish(){
+      this.sendVote()
+    },
+    start(){
+      //this.pauseFinalTimer()
+      //this.pauseVotedTimer()
+      setTimeout(() => {
+        this.finalTimerCount = 10;
+        this.votedTimerCount = 10;
+      }, 500);
+      this.clearModel();
+    }
+  },
+    playFinalTimer() {
+      this.finalTimerEnabled = true;
+    },
+    pauseFinalTimer() {
+      this.finalTimerEnabled = false;
+    },
+    playVotedTimer() {
+      this.votedTimerEnabled = true;
+    },
+    pauseVotedTimer() {
+      this.votedTimerEnabled = false;
+    },
+  computed: {
+    ...mapGetters({
+      //STEPS
+      stepState: 'app/getStepState',
+      stepTitle: 'app/getStepTitle',
+      stepMessage: 'app/getStepMessage',
+      stepCompletion: 'app/getStepCompletion',
+      //Employee
+      employeeFullname: 'app/getEmployeeFullname',
+      employeePosition: 'app/getEmployeePosition',
+      employeePhoto: 'app/getEmployeePhoto',
+    }),
+    ...mapState({
+      dtoRecordId: state => state.app.dto.ratingRecordId,
+      dtoRecordComment: state => state.app.dto.ratingRecordComment
+    })
   },
   watch: {
     //Синий таймер
@@ -152,114 +219,6 @@ export default {
       immediate: true // This ensures the watcher is triggered upon creation
     }
   },
-  methods: {
-
-    onChange(input) {
-      this.dto.ratingRecordComment = input;
-    },
-    onKeyPress(button) {
-      console.log("button", button);
-    },
-    onInputChange(input) {
-      this.dto.ratingRecordComment = input.target.value;
-    },
-
-    playFinalTimer() {
-      this.finalTimerEnabled = true;
-    },
-    pauseFinalTimer() {
-      this.finalTimerEnabled = false;
-    },
-    playVotedTimer() {
-      this.votedTimerEnabled = true;
-    },
-    pauseVotedTimer() {
-      this.votedTimerEnabled = false;
-    },
-    gotoFirst() {
-      this.step.number = 1;
-      this.step.text = 'Первый шаг';
-      this.step.message = 'Отсканируйте выданный вам штрихкод';
-      this.step.value = 20;
-      setTimeout(() => {
-        document.getElementById('autofocus').focus();
-      }, 500);
-    },
-    gotoSecond() {
-      if (this.delayTimer) {
-        clearTimeout(this.delayTimer);
-        this.delayTimer = null;
-      }
-      this.delayTimer = setTimeout(async () => {
-        const params = {ratingRecordId: this.dto.ratingRecordId}
-        const response = await axios.get(connections.api.dev, {params});
-        if(response.data.status === 'not voted'){
-          //State Machine
-          this.step.number = 2;
-          this.step.text = 'Второй шаг';
-          this.step.message = 'Выбирите справедливую на ваш взгляд оценку';
-          this.step.value = 40;
-          //Сотрудник
-          this.employee.employeeSurname = response.data.body.employeeSurname
-          this.employee.employeeFirstName = response.data.body.employeeFirstName
-          this.employee.employeeSecondName = response.data.body.employeeSecondName
-          this.employee.employeePosition = response.data.body.employeePosition
-          this.employee.employeePhoto = response.data.body.employeePhoto
-        }
-        else {
-          this.playVotedTimer();
-          this.step.number = 5;
-          this.step.text = 'Ошибка';
-          this.step.message = 'Вы уже голосовали за этого врача!';
-          this.step.value = 40;
-        }
-      }, 300);
-
-    },
-    gotoThird(value) {
-      this.step.number = 3;
-      this.step.text = 'Третий шаг';
-      this.step.message = 'Отлично! Оставьте комментарий';
-      this.step.value = 70;
-      this.dto.ratingRecordValue = value;
-    },
-    async sendVote() {
-      const response = await axios.post(connections.api.dev, {
-        ratingRecordId: this.dto.ratingRecordId,
-        ratingRecordValue: this.dto.ratingRecordValue,
-        ratingRecordComment: this.dto.ratingRecordComment});
-      this.step.number = 4;
-      this.step.text = 'Конец';
-      this.step.message = 'Оценка завершена';
-      this.step.value = 100;
-      this.playFinalTimer();
-      console.log('This INPUT ' + this.input)
-      console.log('This DTO Record Comment ' + this.dto.ratingRecordComment)
-    },
-    clearModel(){
-      this.pauseFinalTimer()
-      this.pauseVotedTimer()
-      setTimeout(() => {
-        this.finalTimerCount = 10;
-        this.votedTimerCount = 10;
-      }, 500);
-
-      this.step.number = 0;
-      this.step.text = 'Начало'
-      this.step.message = 'Начните оценку'
-      this.step.value = 0;
-
-      this.dto.ratingRecordId = '';
-      this.dto.ratingRecordValue = 0;
-      this.dto.ratingRecordComment = '';
-
-      this.employee.employeeSurname = '';
-      this.employee.employeeFirstName = '';
-      this.employee.employeeSecondName = '';
-      this.employee.employeePosition = '';
-      this.employee.employeePhoto = '';
-    }
-  }
 }
 </script>
 <style>
