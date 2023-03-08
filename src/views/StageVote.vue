@@ -40,7 +40,8 @@ export default {
       thirdStep: "app/THIRD_STEP"
     }),
     gotoThird(grade) {
-      this.$router.push('/step-three');
+      console.log(this.$route.params)
+      this.$router.push('/comment');
       this.thirdStep(grade);
     }
   },

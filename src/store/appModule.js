@@ -48,7 +48,6 @@ export const appModule = {
         }
     },
     mutations: {
-
         ['FIRST_STEP'](state){
             state.step.state = 'first';
             state.step.title = 'Первый шаг';
@@ -89,7 +88,6 @@ export const appModule = {
         },
         ['KEYBOARD_ON_CHANGE'](state, input){
             state.dto.ratingRecordComment = input;
-            console.log(state.dto)
         },
         ['SET_RATING_RECORD_ID'](state, ratingRecordId){
             state.dto.ratingRecordId = ratingRecordId;

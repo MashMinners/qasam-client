@@ -39,6 +39,7 @@ export default {
       sendVote: "app/sendVoteAction"
     }),
     finish(){
+      this.$router.push('finish');
       this.sendVote()
     }
   },

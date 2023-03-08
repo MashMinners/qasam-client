@@ -18,8 +18,31 @@
 </template>
 
 <script>
+import {mapGetters, mapMutations} from "vuex";
+
 export default {
-  name: "StepFinish"
+  name: "StepFinish",
+  methods: {
+    ...mapMutations({
+      clearModel: "app/CLEAR_MODEL"
+    }),
+    start(){
+      //this.pauseFinalTimer()
+      //this.pauseVotedTimer()
+      setTimeout(() => {
+        this.finalTimerCount = 10;
+        this.votedTimerCount = 10;
+      }, 500);
+      this.clearModel();
+      this.$router.push({name: 'start'});
+    }
+  },
+  computed: {
+    ...mapGetters({
+      //STEPS
+      stepTitle: 'app/getStepTitle',
+    })
+  }
 }
 </script>
 

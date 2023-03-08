@@ -7,7 +7,7 @@
       <div class="card">
         <div class="p-fluid grid">
           <div class="centered">
-            <prime-input-text id="autofocus" :value="dtoRecordId" @input="gotoSecond" />
+            <prime-button label="Начать" class="p-button-lg" @click = gotoFirst />
           </div>
         </div>
       </div>
@@ -16,29 +16,26 @@
 </template>
 
 <script>
-import {mapActions, mapGetters, mapState} from "vuex";
+import {mapGetters, mapMutations, mapState} from "vuex";
 
 export default {
-  name: "StepOne",
+  name: "StepStart",
   methods: {
-    ...mapActions({
-      secondStep: "app/isVotedAction"
+    ...mapMutations({
+      firstStep: "app/FIRST_STEP"
     }),
-    gotoSecond(id){
-      this.$router.push('/step-two');
-      if (this.delayTimer) {
-        clearTimeout(this.delayTimer);
-        this.delayTimer = null;
-      }
-      this.delayTimer = setTimeout(()=>{
-        this.secondStep(id.target.value);
-      },500)
-    }
+    gotoFirst() {
+      this.$router.push('/step-one');
+      this.firstStep();
+      setTimeout(() => {
+        document.getElementById('autofocus').focus();
+      }, 500);
+    },
   },
   computed: {
     ...mapGetters({
       stepState: 'app/getStepState',
-      stepTitle: 'app/getStepTitle'
+      stepTitle: 'app/getStepTitle',
     }),
     ...mapState({
       dtoRecordId: state => state.app.dto.ratingRecordId
