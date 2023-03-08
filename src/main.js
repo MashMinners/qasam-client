@@ -3,6 +3,7 @@ import App from './App.vue'
 import PrimeVue from 'primevue/config';
 import PrimeVueModules from "@/configs/prime.vue.modules";
 import store from "@/store";
+import router from './router'
 
 
 const app = createApp(App)
@@ -17,4 +18,5 @@ PrimeVueModules.services.forEach(service => {
     app.use(service.name, service.subject)
 })
 app.use(store);
+app.use(router);
 app.mount('#app');
