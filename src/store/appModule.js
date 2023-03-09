@@ -3,6 +3,7 @@ import axios from "axios";
 
 export const appModule = {
     state:() => ({
+        isVoted: false,
         step: {
             state: 'start', //first, second, third, finish, voted
             title: 'Начало',
@@ -23,10 +24,10 @@ export const appModule = {
         }
     }),
     getters: {
-        //Steps
-        getStepState(state){
-            return state.step.state;
+        isVoted(state){
+            return state.isVoted;
         },
+        //Steps
         getStepTitle(state){
           return state.step.title;
         },
@@ -73,7 +74,7 @@ export const appModule = {
             state.step.message = 'Вы уже голосовали за этого врача!';
             state.step.completion = 40;
         },
-        ['THIRD_STEP'](state, grade){
+        ['ESTIMATE'](state, grade){
             state.step.state = 'third';
             state.step.title = 'Третий шаг';
             state.step.message = 'Отлично! Оставьте комментарий';
@@ -110,7 +111,7 @@ export const appModule = {
         },
     },
     actions: {
-        async isVotedAction({state, commit}, ratingRecordId){
+        async checkUuidAction({state, commit}, ratingRecordId) {
             const params = {ratingRecordId: ratingRecordId}
             const response = await axios.get(connections.api.production ? connections.api.production : connections.api.dev, {params});
             if(response.data.status === 'not voted'){

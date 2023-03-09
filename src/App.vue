@@ -7,7 +7,17 @@
       <div class="mt-1 mb-3">
         <prime-progress-bar :value = stepCompletion :show-value="false"></prime-progress-bar>
       </div>
-      <router-view/>
+      <router-view v-slot="{ Component, route }">
+        <prime-fieldset>
+          <template #legend>
+            {{ stepTitle }}
+          </template>
+            <component
+                :is="Component"
+                :key="route.meta.usePathKey ? route.path : undefined"
+            />
+        </prime-fieldset>
+      </router-view>
     </div>
   </div>
 </template>

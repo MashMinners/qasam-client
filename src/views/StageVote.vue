@@ -1,9 +1,5 @@
 <template>
-  <prime-fieldset>
-    <template #legend>
-      {{ stepTitle }}
-    </template>
-    <div class="card">
+  <div class="card" v-if="!isVoted">
       <div class="p-fluid grid">
         <Transition>
           <div class="centered" style="width:50%">
@@ -14,46 +10,59 @@
             </div>
             <div class="p-fluid grid">
               <div class="field col-4">
-                <prime-button class="p-button-lg p-button-success" label="Отлично"  @click = "gotoThird('good')" />
+                <prime-button class="p-button-lg p-button-success" label="Отлично"  @click = "vote('good')" />
               </div>
               <div class="field col-4">
-                <prime-button class="p-button-lg p-button-warning" label="Нормально"  @click = "gotoThird('normal')" />
+                <prime-button class="p-button-lg p-button-warning" label="Нормально"  @click = "vote('normal')" />
               </div>
               <div class="field col-4">
-                <prime-button class="p-button-lg p-button-danger" label="Плохо"  @click = "gotoThird('bad')" />
+                <prime-button class="p-button-lg p-button-danger" label="Плохо"  @click = "vote('bad')" />
               </div>
             </div>
           </div>
         </Transition>
       </div>
     </div>
-  </prime-fieldset>
+  <div class="card" v-else>
+    <div class="p-fluid grid">
+      <div class="centered">
+        <prime-message severity="error" :closable="false"> Вы уже голосовали за данного врача!</prime-message>
+        <prime-knob class="centered-text mt-1 mb-1" valueColor="#EF4444" rangeColor="#ffe7e6" textColor="#EF4444" v-model="votedTimerCount" :max="10"/>
+        <prime-button label="В начало" class="p-button-lg p-button-danger" @click="start"/>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 
 export default {
   name: "StepTwo",
   methods: {
     ...mapMutations({
-      thirdStep: "app/THIRD_STEP"
+      estimate: "app/ESTIMATE"
     }),
-    gotoThird(grade) {
-      console.log(this.$route.params)
+    ...mapActions({
+      checkUuid: "app/checkUuidAction"
+    }),
+    vote(grade) {
       this.$router.push('/comment');
-      this.thirdStep(grade);
+      this.estimate(grade);
     }
   },
   computed: {
     ...mapGetters({
-      stepState: 'app/getStepState',
-      stepTitle: 'app/getStepTitle',
+      //State
+      isVoted: 'app/isVoted',
       //Employee
       employeeFullname: 'app/getEmployeeFullname',
       employeePosition: 'app/getEmployeePosition',
       employeePhoto: 'app/getEmployeePhoto',
     }),
+  },
+  mounted(){
+    this.checkUuid((this.$route.params.uuid))
   }
 }
 </script>

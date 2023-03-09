@@ -1,26 +1,19 @@
 <template>
-  <div>
-    <prime-fieldset>
-      <template #legend>
-        {{ stepTitle }}
-      </template>
-      <div class="card">
-        <div class="p-fluid grid">
-          <div class="centered">
-            <prime-textarea
-                :autoResize="true"
-                rows="5"
-                cols="30"
-                :value="dtoRecordComment"
-                class="input"
-                placeholder="Оставьте комментарий"
-            />
-            <simple-keyboard @onChange="keyboardOnChange" :input="dtoRecordComment" style="width: 800px;"/>
-            <prime-button label="Закончить" class="p-button-lg mt-3" @click="finish"/>
-          </div>
-        </div>
+  <div class="card">
+    <div class="p-fluid grid">
+      <div class="centered">
+        <prime-textarea
+            :autoResize="true"
+            rows="5"
+            cols="30"
+            :value="dtoRecordComment"
+            class="input"
+            placeholder="Оставьте комментарий"
+        />
+        <simple-keyboard @onChange="keyboardOnChange" :input="dtoRecordComment" style="width: 800px;"/>
+        <prime-button label="Закончить" class="p-button-lg mt-3" @click="finish"/>
       </div>
-    </prime-fieldset>
+    </div>
   </div>
 </template>
 
@@ -44,10 +37,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      stepState: 'app/getStepState',
-      stepTitle: 'app/getStepTitle'
-    }),
     ...mapState({
       dtoRecordComment: state => state.app.dto.ratingRecordComment
     })
