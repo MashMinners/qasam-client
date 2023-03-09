@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="!isVoted">
+  <div class="card" v-if="status === 'not voted'">
       <div class="p-fluid grid">
         <Transition>
           <div class="centered" style="width:50%">
@@ -23,7 +23,7 @@
         </Transition>
       </div>
     </div>
-  <div class="card" v-else>
+  <div class="card" v-else-if="status === 'voted'">
     <div class="p-fluid grid">
       <div class="centered">
         <prime-message severity="error" :closable="false"> Вы уже голосовали за данного врача!</prime-message>
@@ -44,7 +44,7 @@ export default {
       estimate: "app/ESTIMATE"
     }),
     ...mapActions({
-      checkUuid: "app/checkUuidAction"
+      checkUuid: "app/checkRatingRecordStatusAction"
     }),
     vote(grade) {
       this.$router.push('/comment');
@@ -54,7 +54,7 @@ export default {
   computed: {
     ...mapGetters({
       //State
-      isVoted: 'app/isVoted',
+      status: 'app/ratingRecordStatus',
       //Employee
       employeeFullname: 'app/getEmployeeFullname',
       employeePosition: 'app/getEmployeePosition',

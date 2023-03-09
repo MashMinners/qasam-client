@@ -3,9 +3,8 @@ import axios from "axios";
 
 export const appModule = {
     state:() => ({
-        isVoted: false,
-        step: {
-            state: 'start', //first, second, third, finish, voted
+        ratingRecordStatus: '',
+        stage: {
             title: 'Начало',
             message: 'Начните оценку',
             completion: 0
@@ -24,18 +23,19 @@ export const appModule = {
         }
     }),
     getters: {
-        isVoted(state){
-            return state.isVoted;
+        //Record Status
+        ratingRecordStatus(state){
+            return state.ratingRecordStatus;
         },
         //Steps
         getStepTitle(state){
-          return state.step.title;
+          return state.stage.title;
         },
         getStepMessage(state){
-            return state.step.message;
+            return state.stage.message;
         },
         getStepCompletion(state){
-            return state.step.completion;
+            return state.stage.completion;
         },
         //Employee
         getEmployeeFullname(state) {
@@ -49,18 +49,17 @@ export const appModule = {
         }
     },
     mutations: {
-        ['FIRST_STEP'](state){
-            state.step.state = 'first';
-            state.step.title = 'Первый шаг';
-            state.step.message = 'Отсканируйте выданный вам штрихкод';
-            state.step.completion = 20;
+        ['SCANNING'](state){
+            state.stage.title = 'Первый шаг';
+            state.stage.message = 'Отсканируйте выданный вам штрихкод';
+            state.stage.completion = 20;
         },
-        ['SECOND_STEP_NOT_VOTED'](state, response){
+        ['NOT_VOTED'](state, response){
+            state.ratingRecordStatus = 'not voted',
             //State machine
-            state.step.state = 'second';
-            state.step.title = 'Второй шаг';
-            state.step.message = 'Выбирите справедливую на ваш взгляд оценку';
-            state.step.completion = 40;
+            state.stage.title = 'Второй шаг';
+            state.stage.message = 'Выбирите справедливую на ваш взгляд оценку';
+            state.stage.completion = 40;
             //Employee
             state.employee.employeeSurname = response.data.body.employeeSurname
             state.employee.employeeFirstName = response.data.body.employeeFirstName
@@ -68,24 +67,22 @@ export const appModule = {
             state.employee.employeePosition = response.data.body.employeePosition
             state.employee.employeePhoto = response.data.body.employeePhoto
         },
-        ['SECOND_STEP_VOTED'](state){
-            state.step.state = 'voted';
-            state.step.title = 'Ошибка';
-            state.step.message = 'Вы уже голосовали за этого врача!';
-            state.step.completion = 40;
+        ['VOTED'](state){
+            state.ratingRecordStatus = 'voted';
+            state.stage.title = 'Ошибка';
+            state.stage.message = 'Вы уже голосовали за этого врача!';
+            state.stage.completion = 40;
         },
         ['ESTIMATE'](state, grade){
-            state.step.state = 'third';
-            state.step.title = 'Третий шаг';
-            state.step.message = 'Отлично! Оставьте комментарий';
-            state.step.completion = 70;
+            state.stage.title = 'Третий шаг';
+            state.stage.message = 'Отлично! Оставьте комментарий';
+            state.stage.completion = 70;
             state.dto.ratingRecordGrade = grade;
         },
         ['FINISH'](state){
-            state.step.state = 'finish';
-            state.step.title = 'Конец';
-            state.step.message = 'Оценка завершена';
-            state.step.completion = 100;
+            state.stage.title = 'Конец';
+            state.stage.message = 'Оценка завершена';
+            state.stage.completion = 100;
         },
         ['KEYBOARD_ON_CHANGE'](state, input){
             state.dto.ratingRecordComment = input;
@@ -94,10 +91,9 @@ export const appModule = {
             state.dto.ratingRecordId = ratingRecordId;
         },
         ['CLEAR_MODEL'](state){
-            state.step.state = 'start';
-            state.step.title = 'Начало'
-            state.step.message = 'Начните оценку'
-            state.step.completion = 0;
+            state.stage.title = 'Начало'
+            state.stage.message = 'Начните оценку'
+            state.stage.completion = 0;
 
             state.dto.ratingRecordId = '';
             state.dto.ratingRecordGrade = '';
@@ -111,16 +107,16 @@ export const appModule = {
         },
     },
     actions: {
-        async checkUuidAction({state, commit}, ratingRecordId) {
+        async checkRatingRecordStatusAction({state, commit}, ratingRecordId) {
             const params = {ratingRecordId: ratingRecordId}
             const response = await axios.get(connections.api.production ? connections.api.production : connections.api.dev, {params});
             if(response.data.status === 'not voted'){
-                commit('SECOND_STEP_NOT_VOTED', response)
+                commit('NOT_VOTED', response)
                 commit('SET_RATING_RECORD_ID', ratingRecordId)
                 return false;
             }
             else {
-                commit('SECOND_STEP_VOTED')
+                commit('VOTED')
                 return true;
             }
         },

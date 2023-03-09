@@ -8,6 +8,7 @@ const routes = [
     {
         path: '/',
         name: 'start',
+        meta: { message: '1' },
         component: function () {
             return import('../views/StageStart.vue')
         }

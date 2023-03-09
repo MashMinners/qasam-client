@@ -15,11 +15,11 @@ export default {
   name: "StepStart",
   methods: {
     ...mapMutations({
-      firstStep: "app/FIRST_STEP"
+      scanning: "app/SCANNING"
     }),
     ScanQR() {
       this.$router.push('/scanning');
-      this.firstStep();
+      this.scanning();
       setTimeout(() => {
         document.getElementById('autofocus').focus();
       }, 500);
