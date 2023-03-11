@@ -4,7 +4,7 @@
         <Transition>
           <div class="centered" style="width:50%">
             <div>
-              <!--<img class="employee-photo centered" :src="require('@/storage/'+ employeePhoto)" width="300">-->
+              <img class="employee-photo centered" :src="require('@/storage/'+ employeePhoto)" width="300">
               <p class="employee-full-name">{{employeeFullname}}</p>
               <p class="employee-position">{{employeePosition}}</p>
             </div>
@@ -41,7 +41,8 @@ export default {
   name: "StepTwo",
   methods: {
     ...mapMutations({
-      estimate: "app/ESTIMATE"
+      estimate: "app/ESTIMATE",
+      clearModel: "app/CLEAR_MODEL"
     }),
     ...mapActions({
       checkUuid: "app/checkRatingRecordStatusAction"
@@ -49,6 +50,16 @@ export default {
     vote(grade) {
       this.$router.push('/comment');
       this.estimate(grade);
+    },
+    start(){
+      //this.pauseFinalTimer()
+      //this.pauseVotedTimer()
+      setTimeout(() => {
+        this.finalTimerCount = 10;
+        this.votedTimerCount = 10;
+      }, 500);
+      this.clearModel();
+      this.$router.push({name: 'start'});
     }
   },
   computed: {
