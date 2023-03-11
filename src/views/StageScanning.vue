@@ -15,6 +15,11 @@
 import {mapState} from "vuex";
 
 export default {
+  data() {
+    return {
+      delayTimer: null
+    }
+  },
   name: "StepOne",
   methods: {
     Vote(event){
