@@ -8,7 +8,9 @@ const routes = [
     {
         path: '/',
         name: 'start',
-        meta: { message: '1' },
+        meta: {
+            layout: 'Default',
+        },
         component: function () {
             return import('../views/StageStart.vue')
         }
@@ -16,6 +18,9 @@ const routes = [
     {
         path: '/scanning',
         name: 'scanning',
+        meta: {
+            layout: 'ControlPanel',
+        },
         component: function () {
             return import('../views/StageScanning.vue')
         }

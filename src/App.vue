@@ -1,5 +1,6 @@
 <template>
   <div id="wrapper">
+    <component :is="layout">
     <div id="app-header">
       <prime-message severity="info" :closable="false">{{ stepMessage }}</prime-message>
     </div>
@@ -7,22 +8,24 @@
       <div class="mt-1 mb-3">
         <prime-progress-bar :value = stepCompletion :show-value="false"></prime-progress-bar>
       </div>
-      <router-view v-slot="{ Component, route }">
-        <prime-fieldset>
-          <template #legend>
-            {{ stepTitle }}
-          </template>
+        <router-view v-slot="{ Component, route }">
+          <prime-fieldset>
+            <template #legend>
+              {{ stepTitle }}
+            </template>
             <component
                 :is="Component"
                 :key="route.meta.usePathKey ? route.path : undefined"
             />
-        </prime-fieldset>
-      </router-view>
+          </prime-fieldset>
+        </router-view>
     </div>
+    </component>
   </div>
 </template>
 <script>
 import {mapGetters} from "vuex";
+import ControlPanelLayout from "@/layouts/ControlPanelLayout.vue";
 export default {
   data() {
     return {
@@ -33,70 +36,21 @@ export default {
       delayTimer: null
     }
   },
-  methods: {
-    playFinalTimer() {
-      this.finalTimerEnabled = true;
-    },
-    pauseFinalTimer() {
-      this.finalTimerEnabled = false;
-    },
-    playVotedTimer() {
-      this.votedTimerEnabled = true;
-    },
-    pauseVotedTimer() {
-      this.votedTimerEnabled = false;
-    }
+  components: {
+    ControlPanelLayout
   },
   computed: {
+    layout () {
+      console.log(this.$route.meta.layout)
+      return (this.$route.meta.layout +'Layout' || 'ApplicationLayout')
+    },
     ...mapGetters({
       //STEPS
       stepTitle: 'app/getStepTitle',
       stepMessage: 'app/getStepMessage',
       stepCompletion: 'app/getStepCompletion',
     })
-  },
-  watch: {
-    //Синий таймер
-    finalTimerEnabled(value) {
-      if (value) {
-        setTimeout(() => {
-          this.finalTimerCount--;
-        }, 1000);
-      }
-    },
-    finalTimerCount: {
-      handler(value) {
-        if (value > 0 && this.finalTimerEnabled) {
-          setTimeout(() => {
-            this.finalTimerCount--;
-          }, 1000);
-        }else if(value === 0){
-          this.clearModel()
-        }
-      },
-      immediate: true // This ensures the watcher is triggered upon creation
-    },
-    //Красный таймер
-    votedTimerEnabled(value) {
-      if (value) {
-        setTimeout(() => {
-          this.votedTimerCount--;
-        }, 1000);
-      }
-    },
-    votedTimerCount: {
-      handler(value) {
-        if (value > 0 && this.votedTimerEnabled) {
-          setTimeout(() => {
-            this.votedTimerCount--;
-          }, 1000);
-        }else if(value === 0){
-          this.clearModel()
-        }
-      },
-      immediate: true // This ensures the watcher is triggered upon creation
-    }
-  },
+  }
 }
 </script>
 <style>
