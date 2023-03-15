@@ -9,7 +9,7 @@ const routes = [
         path: '/',
         name: 'start',
         meta: {
-            layout: 'Default',
+            layout: 'Application'
         },
         component: function () {
             return import('../views/StageStart.vue')
@@ -19,7 +19,7 @@ const routes = [
         path: '/scanning',
         name: 'scanning',
         meta: {
-            layout: 'ControlPanel',
+            layout: 'Application'
         },
         component: function () {
             return import('../views/StageScanning.vue')
@@ -28,6 +28,9 @@ const routes = [
     {
         path: '/vote/:uuid',
         name: 'vote',
+        meta: {
+            layout: 'ControlPanel',
+        },
         component: function () {
             return import('../views/StageVote.vue')
         }

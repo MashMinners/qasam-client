@@ -12,7 +12,7 @@
 import {mapMutations} from "vuex";
 
 export default {
-  name: "StepStart",
+  name: "StageStart",
   methods: {
     ...mapMutations({
       scanning: "app/SCANNING"

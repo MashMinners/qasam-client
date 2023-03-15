@@ -1,55 +1,22 @@
 <template>
   <div id="wrapper">
     <component :is="layout">
-    <div id="app-header">
-      <prime-message severity="info" :closable="false">{{ stepMessage }}</prime-message>
-    </div>
-    <div id="app-content">
-      <div class="mt-1 mb-3">
-        <prime-progress-bar :value = stepCompletion :show-value="false"></prime-progress-bar>
-      </div>
-        <router-view v-slot="{ Component, route }">
-          <prime-fieldset>
-            <template #legend>
-              {{ stepTitle }}
-            </template>
-            <component
-                :is="Component"
-                :key="route.meta.usePathKey ? route.path : undefined"
-            />
-          </prime-fieldset>
-        </router-view>
-    </div>
+      <router-view />
     </component>
   </div>
 </template>
+
 <script>
-import {mapGetters} from "vuex";
+import ApplicationLayout from "@/layouts/ApplicationLayout.vue";
 import ControlPanelLayout from "@/layouts/ControlPanelLayout.vue";
 export default {
-  data() {
-    return {
-      finalTimerEnabled: false,
-      finalTimerCount: 10,
-      votedTimerEnabled: false,
-      votedTimerCount: 10,
-      delayTimer: null
-    }
-  },
   components: {
-    ControlPanelLayout
+    ControlPanelLayout, ApplicationLayout
   },
   computed: {
     layout () {
-      console.log(this.$route.meta.layout)
-      return (this.$route.meta.layout +'Layout' || 'ApplicationLayout')
-    },
-    ...mapGetters({
-      //STEPS
-      stepTitle: 'app/getStepTitle',
-      stepMessage: 'app/getStepMessage',
-      stepCompletion: 'app/getStepCompletion',
-    })
+      return (this.$route.meta.layout +'Layout')
+    }
   }
 }
 </script>
