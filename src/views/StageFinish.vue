@@ -20,7 +20,7 @@ export default {
       timerCount: 10
     }
   },
-  name: "StepFinish",
+  name: "StageFinish",
   methods: {
     ...mapMutations({
       clearModel: "app/CLEAR_MODEL"

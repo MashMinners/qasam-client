@@ -20,7 +20,7 @@ export default {
       delayTimer: null
     }
   },
-  name: "StepOne",
+  name: "StageScanning",
   methods: {
     Vote(event){
       if (this.delayTimer) {

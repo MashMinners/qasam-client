@@ -44,7 +44,7 @@ export default {
       timerCount: 10
     }
   },
-  name: "StepTwo",
+  name: "StageVote",
   methods: {
     ...mapMutations({
       estimate: "app/ESTIMATE",

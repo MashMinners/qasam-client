@@ -29,7 +29,7 @@ const routes = [
         path: '/vote/:uuid',
         name: 'vote',
         meta: {
-            layout: 'ControlPanel',
+            layout: 'Application',
         },
         component: function () {
             return import('../views/StageVote.vue')
@@ -38,6 +38,9 @@ const routes = [
     {
         path: '/comment',
         name: 'comment',
+        meta: {
+            layout: 'Application',
+        },
         component: function () {
             return import('../views/StageComment.vue')
         }
@@ -45,6 +48,9 @@ const routes = [
     {
         path: '/finish',
         name: 'finish',
+        meta: {
+            layout: 'Application',
+        },
         component: function () {
             return import('../views/StageFinish.vue')
         }
@@ -52,8 +58,21 @@ const routes = [
     {
         path: '/voted',
         name: 'voted',
+        meta: {
+            layout: 'Application',
+        },
         component: function () {
             return import('../views/StageFinish.vue')
+        }
+    },
+    {
+        path: '/control-panel',
+        name: 'control-panel',
+        meta: {
+            layout: 'ControlPanel',
+        },
+        component: function () {
+            //return import('../views/StageFinish.vue')
         }
     }
 ]

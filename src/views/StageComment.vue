@@ -22,7 +22,7 @@ import SimpleKeyboard from "@/components/SimpleKeyboard.vue";
 import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
 
 export default {
-  name: "StepThree",
+  name: "StageComment",
   components: {SimpleKeyboard},
   methods: {
     ...mapMutations({
