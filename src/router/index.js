@@ -66,13 +66,13 @@ const routes = [
         }
     },
     {
-        path: '/control-panel',
-        name: 'control-panel',
+        path: '/cp',
+        name: 'cp',
         meta: {
             layout: 'ControlPanel',
         },
         component: function () {
-            //return import('../views/StageFinish.vue')
+            return import('../views/StageFinish.vue')
         }
     }
 ]
